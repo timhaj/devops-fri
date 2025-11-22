@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 // Configuration
 const PORT = 3000;
 const GANACHE_URL = 'http://127.0.0.1:7545';
-const CONTRACT_ADDRESS = '0xD23Bfc6f3d25BAfeC0885d00E72856a1974CB98F'; // Update after deployment
+const CONTRACT_ADDRESS = '0xe6200306A23B9606a197a20277e46602a755B8a9'; // Update after deployment
 const CONTRACT_ABI = [
     {
         "inputs": [],
