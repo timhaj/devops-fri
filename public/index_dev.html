@@ -165,7 +165,7 @@
 (() => {
   // Configuration
   const BACKEND_URL = 'http://localhost:3000';
-  const CONTRACT_ADDRESS = '0xe6200306A23B9606a197a20277e46602a755B8a9'; // Update this
+  const CONTRACT_ADDRESS = '0x48290f81F582259c385bC3bebBc21d6f507b3C1E'; // Update this
   const CONTRACT_ABI = [
     {
       "inputs": [],
@@ -732,19 +732,52 @@
   // Blockchain functions
   async function connectWallet() {
     try {
+      console.log('Starting wallet connection...');
+      
       if (typeof window.ethereum !== 'undefined') {
+        console.log('MetaMask detected');
+        
+        // Check configuration
+        if (!CONTRACT_ADDRESS || CONTRACT_ADDRESS === 'YOUR_CONTRACT_ADDRESS') {
+          alert('⚠️ Please update CONTRACT_ADDRESS in the HTML file!');
+          return;
+        }
+        if (!CONTRACT_ABI || CONTRACT_ABI.length === 0) {
+          alert('⚠️ Please update CONTRACT_ABI in the HTML file!');
+          return;
+        }
+        
+        console.log('Contract address:', CONTRACT_ADDRESS);
+        console.log('ABI length:', CONTRACT_ABI.length);
+        
         web3 = new Web3(window.ethereum);
+        console.log('Web3 initialized');
+        
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         userAccount = accounts[0];
+        console.log('Account connected:', userAccount);
         
+        // Check network
+        const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+        console.log('Connected to chain ID:', chainId);
+        
+/*         if (chainId !== '0xaa36a7') { // Sepolia chain ID in hex
+          alert('⚠️ Please switch to Sepolia network in MetaMask!');
+          return;
+        } */
+        
+        console.log('Initializing contract...');
         contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+        console.log('Contract initialized successfully');
         
         connectBtn.classList.add('hidden');
         walletInfo.classList.remove('hidden');
         bettingForm.classList.remove('hidden');
         walletAddress.textContent = userAccount.substring(0, 6) + '...' + userAccount.substring(38);
         
+        console.log('Fetching balance...');
         await updateBalance();
+        console.log('Wallet connection complete!');
         
         window.ethereum.on('accountsChanged', (accounts) => {
           userAccount = accounts[0];
@@ -756,6 +789,11 @@
       }
     } catch (error) {
       console.error('Error connecting wallet:', error);
+      console.error('Error details:', {
+        message: error.message,
+        code: error.code,
+        stack: error.stack
+      });
       alert('Failed to connect wallet: ' + error.message);
     }
   }

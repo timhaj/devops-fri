@@ -1,54 +1,39 @@
-const { Web3 } = require('web3'); // Note the destructured import
+const { Web3 } = require('web3');
 const contractJSON = require('../build/contracts/RPSBetting.json');
+require('dotenv').config();
 
-// Configuration
-const GANACHE_URL = 'http://127.0.0.1:7545';
-const CONTRACT_ADDRESS = '0xe6200306A23B9606a197a20277e46602a755B8a9'; // Update with your deployed address
+const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL;
+const CONTRACT_ADDRESS = '0x48290f81F582259c385bC3bebBc21d6f507b3C1E'; // From step 7
+const PRIVATE_KEY = process.env.PRIVATE_KEY; // Add this to .env
 
 async function fundContract() {
     try {
-        console.log('Connecting to Ganache...');
-        const web3 = new Web3(GANACHE_URL);
+        const web3 = new Web3(SEPOLIA_RPC_URL);
 
-        // Get accounts
-        const accounts = await web3.eth.getAccounts();
-        const ownerAccount = accounts[0];
+        const account = web3.eth.accounts.privateKeyToAccount('0x' + PRIVATE_KEY);
+        web3.eth.accounts.wallet.add(account);
 
-        console.log(`Using owner account: ${ownerAccount}`);
+        console.log(`Using account: ${account.address}`);
 
-        // Get owner balance
-        const ownerBalance = await web3.eth.getBalance(ownerAccount);
-        console.log(`Owner balance: ${web3.utils.fromWei(ownerBalance, 'ether')} ETH`);
-
-        // Initialize contract
         const contract = new web3.eth.Contract(contractJSON.abi, CONTRACT_ADDRESS);
 
-        // Check current contract balance
-        const currentBalance = await contract.methods.getContractBalance().call();
-        console.log(`Current contract balance: ${web3.utils.fromWei(currentBalance, 'ether')} ETH`);
+        const fundAmount = web3.utils.toWei('0.03', 'ether');
 
-        // Fund amount (10 ETH)
-        const fundAmount = web3.utils.toWei('10', 'ether');
-
-        console.log('\nSending 10 ETH to contract...');
+        console.log('Sending 0.03 ETH to contract...');
 
         const receipt = await contract.methods.depositFunds().send({
-            from: ownerAccount,
+            from: account.address,
             value: fundAmount,
             gas: 500000
         });
 
-        console.log(`✅ Transaction successful!`);
-        console.log(`Transaction hash: ${receipt.transactionHash}`);
+        console.log(`✅ Transaction: https://sepolia.etherscan.io/tx/${receipt.transactionHash}`);
 
-        // Check new balance
-        const newBalance = await contract.methods.getContractBalance().call();
-        console.log(`\nNew contract balance: ${web3.utils.fromWei(newBalance, 'ether')} ETH`);
+        const balance = await contract.methods.getContractBalance().call();
+        console.log(`Contract balance: ${web3.utils.fromWei(balance, 'ether')} ETH`);
 
-        process.exit(0);
     } catch (error) {
-        console.error('❌ Error funding contract:', error.message);
-        process.exit(1);
+        console.error('Error:', error);
     }
 }
 
