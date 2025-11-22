@@ -11,6 +11,9 @@
   "description": "",
   "dependencies": {
     "@truffle/hdwallet-provider": "^2.1.15",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
     "truffle": "^5.11.5",
     "web3": "^4.16.0"
   }

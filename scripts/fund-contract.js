@@ -3,7 +3,7 @@ const contractJSON = require('../build/contracts/RPSBetting.json');
 
 // Configuration
 const GANACHE_URL = 'http://127.0.0.1:7545';
-const CONTRACT_ADDRESS = '0x18A28B50CeA7e1B4F96508D902fE86848BA2C3d2'; // Update with your deployed address
+const CONTRACT_ADDRESS = '0xD23Bfc6f3d25BAfeC0885d00E72856a1974CB98F'; // Update with your deployed address
 
 async function fundContract() {
     try {
