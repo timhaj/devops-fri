@@ -20,7 +20,7 @@ const PORT = 3000;
 // For Sepolia testnet:
 const RPC_URL = process.env.SEPOLIA_RPC_URL || 'http://127.0.0.1:7545';
 
-const CONTRACT_ADDRESS = '0x48290f81F582259c385bC3bebBc21d6f507b3C1E';
+const CONTRACT_ADDRESS = '0xF2C0149bD9c12f9A9695FbCeD94bd4067B185522';
 const CONTRACT_ABI = require('./build/contracts/RPSBetting.json').abi;
 
 // Web3 setup

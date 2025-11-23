@@ -3,7 +3,7 @@ const contractJSON = require('../build/contracts/RPSBetting.json');
 require('dotenv').config();
 
 const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL;
-const CONTRACT_ADDRESS = '0x48290f81F582259c385bC3bebBc21d6f507b3C1E'; // From step 7
+const CONTRACT_ADDRESS = '0xF2C0149bD9c12f9A9695FbCeD94bd4067B185522'; // From step 7
 const PRIVATE_KEY = process.env.PRIVATE_KEY; // Add this to .env
 
 async function fundContract() {
