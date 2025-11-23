@@ -1,26 +1,21 @@
 #cloud-config
 
-# Update package list
 package_update: true
 package_upgrade: true
 
-# Install required packages
 packages:
   - git
   - curl
 
-# Create the .env file with placeholders for API keys
-# IMPORTANT: Replace these placeholder values with your actual API keys before deploying!
 write_files:
   - path: /root/devops-fri/.env
     permissions: '0600'
     owner: root:root
     defer: true
     content: |
-      # Replace these with your actual API key values
-      API_KEY_1=your_api_key_1_here
-      API_KEY_2=your_api_key_2_here
-      API_KEY_3=your_api_key_3_here
+      MNEMONIC="kiwi there energy noble panda reflect corn cargo echo gravity search embrace"
+      SEPOLIA_RPC_URL="https://eth-sepolia.g.alchemy.com/v2/LkiAFeBAOtY2PCSUvSVKU"
+      PRIVATE_KEY="6500f80b4ec4a8d70e992f8ad089e7d8f900b55d6152a03513a177a29e5d40f3"
 
   - path: /etc/systemd/system/backend-server.service
     permissions: '0644'
@@ -62,28 +57,21 @@ write_files:
       [Install]
       WantedBy=multi-user.target
 
-# Run commands during boot
 runcmd:
-  # Install Node.js 20.x LTS
   - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
   - apt-get install -y nodejs
   
-  # Verify installations
   - node --version
   - npm --version
   
-  # Clone the repository with specific branch
   - git clone -b deploy_test https://github.com/timhaj/devops-fri /root/devops-fri
   
-  # Install npm packages
   - cd /root/devops-fri && npm install express cors web3 body-parser dotenv http-server
   
-  # Enable and start systemd services
   - systemctl daemon-reload
   - systemctl enable backend-server.service
   - systemctl enable frontend-server.service
   - systemctl start backend-server.service
   - systemctl start frontend-server.service
 
-# Final message
 final_message: "Cloud-init deployment complete! Backend running, Frontend on port 8080. IMPORTANT: Update /root/devops-fri/.env with your actual API keys and restart services!"
