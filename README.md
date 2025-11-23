@@ -4,8 +4,10 @@
 
 ### 1. Install Backend Dependencies
 ```bash
-npm install express cors web3 body-parser
+npm install express cors web3 body-parser dotenv http-server
 ```
+
+If error with http-server: "npm install -g http-server"
 
 ### 2. Deploy Smart Contract
 ```bash
