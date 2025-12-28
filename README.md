@@ -30,24 +30,20 @@ cd public
 http-server -p 8080
 ```
 
-# Vagrant
-To run the app using vagrant:
+# Docker
 ```bash
-git clone https://github.com/timhaj/devops-fri
-cd devops-fri
-// create .env file and add the contents above ^
-vagrant up
+cp .env.example .env
+# Edit .env with your credentials (MNEMONIC, SEPOLIA_RPC_URL, PRIVATE_KEY, REDIS_PASSWORD)
+
+docker-compose build
+docker-compose up -d
 ```
 
-# cloud-init
-To run the app using cloud-init:
+# Docker with BuildX
 ```bash
-git clone https://github.com/timhaj/devops-fri
-cd devops-fri
+cp .env.example .env
+# Edit .env with your credentials
 
-sudo cloud-init clean --logs
-sudo cloud-init init --local
-sudo cloud-init init
-sudo cloud-init modules --mode=config
-sudo cloud-init modules --mode=final
+docker-compose -f docker-compose.buildx.yml build
+docker-compose -f docker-compose.buildx.yml up -d
 ```
