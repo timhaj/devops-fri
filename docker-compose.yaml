@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # Backend API Service
   backend:
     build:
       context: .
@@ -23,11 +22,8 @@ services:
       - rps-network
     restart: unless-stopped
     volumes:
-      # Mount for development (optional - comment out for production)
-      # - ./backend-server.js:/app/backend-server.js
       - backend-logs:/app/logs
 
-  # Frontend Service
   frontend:
     build:
       context: .
@@ -41,7 +37,6 @@ services:
       - rps-network
     restart: unless-stopped
 
-  # Redis Service (for future backend caching/session management)
   redis:
     image: redis:7-alpine
     container_name: rps-redis

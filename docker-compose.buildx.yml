@@ -1,24 +1,17 @@
 version: '3.8'
 
 services:
-  # Backend with BuildX optimizations
   backend:
     build:
       context: .
       dockerfile: Dockerfile.backend
-      target: production  # Use the final production stage
-      # Enable BuildKit for better caching and performance
+      target: production
       cache_from:
         - type=registry,ref=yourusername/rps-backend:buildcache
       cache_to:
         - type=inline
-      # BuildX arguments for optimization
       args:
         NODE_ENV: production
-      # Use BuildX platforms for multi-arch support (optional)
-      # platforms:
-      #   - linux/amd64
-      #   - linux/arm64
     image: rps-backend:optimized
     container_name: rps-backend
     ports:
@@ -39,7 +32,6 @@ services:
     volumes:
       - backend-logs:/app/logs
 
-  # Frontend Service
   frontend:
     build:
       context: .
@@ -53,7 +45,6 @@ services:
       - rps-network
     restart: unless-stopped
 
-  # Redis Service
   redis:
     image: redis:7-alpine
     container_name: rps-redis
