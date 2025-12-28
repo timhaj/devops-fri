@@ -1,0 +1,16 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+README.md
+.env
+.DS_Store
+Vagrantfile
+cloud-init-deployment.yaml
+*.md
+.vscode
+.idea
+dist
+*.log
+coverage
+.nyc_output
