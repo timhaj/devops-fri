@@ -1,25 +1,80 @@
-FROM node:20-alpine
+# syntax=docker/dockerfile:1.4
+
+# ============================================
+# Stage 1: Dependencies (all deps)
+# ============================================
+FROM node:20-bullseye-slim AS dependencies
 
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Ignore platform-specific deps like fsevents (darwin-only)
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --ignore-platforms --prefer-offline --no-audit
 
-# Copy application files
-COPY backend-server.js ./
-COPY build ./build
-COPY contracts ./contracts
-COPY migrations ./migrations
+# ============================================
+# Stage 2: Production Dependencies (prod only)
+# ============================================
+FROM node:20-bullseye-slim AS prod-dependencies
 
-# Expose backend port
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --omit=dev --ignore-platforms --prefer-offline --no-audit && \
+    npm cache clean --force
+
+# ============================================
+# Stage 3: Builder
+# ============================================
+FROM dependencies AS builder
+
+WORKDIR /app
+
+COPY . .
+
+# Optional build step (TypeScript / bundlers)
+# RUN npm run build
+
+RUN echo "Build stage complete"
+
+# ============================================
+# Stage 4: Final Production Image
+# ============================================
+FROM node:20-bullseye-slim AS production
+
+# Install dumb-init
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends dumb-init && \
+    rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN groupadd -g 1001 nodejs && \
+    useradd -u 1001 -g nodejs -s /bin/bash nodejs
+
+WORKDIR /app
+
+# Copy production node_modules
+COPY --from=prod-dependencies --chown=nodejs:nodejs /app/node_modules ./node_modules
+
+# Copy runtime files only
+COPY --from=builder --chown=nodejs:nodejs /app/backend-server.js ./
+COPY --from=builder --chown=nodejs:nodejs /app/build ./build
+COPY --from=builder --chown=nodejs:nodejs /app/contracts ./contracts
+COPY --from=builder --chown=nodejs:nodejs /app/migrations ./migrations
+
+# Logs directory
+RUN mkdir -p /app/logs && chown -R nodejs:nodejs /app/logs
+
+USER nodejs
+
 EXPOSE 3000
 
-# Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+  CMD node -e "require('http').get('http://localhost:3000/api/health', r => process.exit(r.statusCode === 200 ? 0 : 1))"
 
-# Start the backend server
+ENTRYPOINT ["dumb-init", "--"]
+
 CMD ["node", "backend-server.js"]
